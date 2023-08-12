@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Проект "Комменты"</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <ul class="comments">
+        <li class="comment">
+          <div class="comment-header">
+            <div>Глеб Фокин</div>
+            <div>12.02.22 12:18</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">
+              Это будет первый комментарий на этой странице
+            </div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">3</span>
+              <button class="like-button"></button>
+            </div>
+          </div>
+        </li>
+        <li class="comment">
+          <div class="comment-header">
+            <div>Варвара Н.</div>
+            <div>13.02.22 19:22</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">
+              Мне нравится как оформлена эта страница! ❤
+            </div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">75</span>
+              <button class="like-button -active-like"></button>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <div class="add-form">
+        <input
+          type="text"
+          class="add-form-name"
+          placeholder="Введите ваше имя"
+        />
+        <textarea
+          type="textarea"
+          class="add-form-text"
+          placeholder="Введите ваш коментарий"
+          rows="4"
+        ></textarea>
+        <div class="add-form-row">
+          <button class="add-form-button">Написать</button>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+      const addButton = document.querySelector(".add-form-button");
+      const nameInput = document.querySelector(".add-form-name");
+      const commentInput = document.querySelector(".add-form-text");
+      const commentsList = document.querySelector(".comments");
+
+      // Функция для создания новых комментариев
+      function createNewComment(name, text, timestamp) {
+        const commentElement = document.createElement("li");
+        commentElement.className = "comment";
+
+        commentElement.innerHTML = `
+          <div class="comment-header">
+            <div>${name}</div>
+            <div>${timestamp}</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">${text}</div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">0</span>
+              <button class="like-button"></button>
+            </div>
+          </div>
+        `;
+
+        return commentElement;
+      }
+
+      // Валидация полей
+      function validateFields(name, text) {
+        if (name.trim() === "" || text.trim() === "") {
+          return false;
+        }
+        return true;
+      }
+
+      // Создать обработчик событий для кнопки 'add-form-button'
+      addButton.addEventListener("click", () => {
+        const name = nameInput.value;
+        const text = commentInput.value;
+
+        if (!validateFields(name, text)) {
+          alert("Пожалуйста, заполните все поля");
+          return;
+        }
+
+        const timestamp = new Date().toLocaleString();
+        const newComment = createNewComment(name, text, timestamp);
+
+        commentsList.appendChild(newComment);
+
+        nameInput.value = "";
+        commentInput.value = "";
+      });
+      document.addEventListener("click", (event) => {
+  // Проверка, является ли нажатый элемент кнопкой лайка
+  if (event.target.classList.contains("like-button")) {
+    const likeButton = event.target;
+    const likeCounter = likeButton.previousElementSibling;
+
+    // Изменение стиля кнопки лайка и обновление счетчика лайков
+    if (likeButton.classList.contains("-active-like")) {
+      likeButton.classList.remove("-active-like");
+      likeCounter.textContent = parseInt(likeCounter.textContent) - 1;
+    } else {
+      likeButton.classList.add("-active-like");
+      likeCounter.textContent = parseInt(likeCounter.textContent) + 1;
+    }
+  }
+});
+  </script>
+</html>
