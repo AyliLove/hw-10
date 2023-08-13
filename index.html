@@ -9,40 +9,6 @@
   <body>
     <div class="container">
       <ul class="comments">
-        <li class="comment">
-          <div class="comment-header">
-            <div>Глеб Фокин</div>
-            <div>12.02.22 12:18</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Это будет первый комментарий на этой странице
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">3</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </li>
-        <li class="comment">
-          <div class="comment-header">
-            <div>Варвара Н.</div>
-            <div>13.02.22 19:22</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Мне нравится как оформлена эта страница! ❤
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">75</span>
-              <button class="like-button -active-like"></button>
-            </div>
-          </div>
-        </li>
       </ul>
       <div class="add-form">
         <input
@@ -64,76 +30,111 @@
   </body>
 
   <script>
-      const addButton = document.querySelector(".add-form-button");
-      const nameInput = document.querySelector(".add-form-name");
-      const commentInput = document.querySelector(".add-form-text");
-      const commentsList = document.querySelector(".comments");
+    const addButton = document.querySelector(".add-form-button");
+    const nameInput = document.querySelector(".add-form-name");
+    const commentInput = document.querySelector(".add-form-text");
+    const commentsList = document.querySelector(".comments");
 
-      // Функция для создания новых комментариев
-      function createNewComment(name, text, timestamp) {
-        const commentElement = document.createElement("li");
-        commentElement.className = "comment";
+    const commentsData = [
+  {
+    id: 1,
+    name: 'Глеб Фокин',
+    text: 'Это будет первый комментарий на этой странице',
+    timestamp: '12.02.22 12:18',
+    likes: 3,
+    liked: false,
+  },
+  {
+    id: 2,
+    name: 'Варвара Н.',
+    text: 'Мне нравится как оформлена эта страница! ❤',
+    timestamp: '13.02.22 19:22',
+    likes: 75,
+    liked: false,
+  },
+];
 
-        commentElement.innerHTML = `
-          <div class="comment-header">
-            <div>${name}</div>
-            <div>${timestamp}</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">${text}</div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">0</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        `;
+    function renderComments() {
+    commentsList.innerHTML = '';
 
-        return commentElement;
-      }
+  commentsData.forEach(comment => {
+    const newComment = createNewComment(comment);
+    commentsList.appendChild(newComment);
+  });
+}
 
-      // Валидация полей
-      function validateFields(name, text) {
-        if (name.trim() === "" || text.trim() === "") {
-          return false;
-        }
-        return true;
-      }
+  function createNewComment(commentData) {
+  const { id, name, text, timestamp, likes, liked } = commentData;
+  const commentElement = document.createElement("li");
+  commentElement.className = "comment";
+  commentElement.dataset.id = id;
 
-      // Создать обработчик событий для кнопки 'add-form-button'
-      addButton.addEventListener("click", () => {
-        const name = nameInput.value;
-        const text = commentInput.value;
+  commentElement.innerHTML = `
+    <div class="comment-header">
+      <div>${name}</div>
+      <div>${timestamp}</div>
+    </div>
+    <div class="comment-body">
+      <div class="comment-text">${text}</div>
+    </div>
+    <div class="comment-footer">
+      <div class="likes">
+        <span class="likes-counter">${likes}</span>
+        <button class="like-button${liked ? ' -active-like' : ''}"></button>
+      </div>
+    </div>
+  `;
 
-        if (!validateFields(name, text)) {
-          alert("Пожалуйста, заполните все поля");
-          return;
-        }
+  // Обработчик для кнопки лайка
+  const likeButton = commentElement.querySelector('.like-button');
+  likeButton.addEventListener('click', () => {
+    toggleLike(id);
+  });
 
-        const timestamp = new Date().toLocaleString();
-        const newComment = createNewComment(name, text, timestamp);
+  return commentElement;
+}
 
-        commentsList.appendChild(newComment);
+function toggleLike(commentId) {
+  const foundComment = commentsData.find(comment => comment.id === commentId);
 
-        nameInput.value = "";
-        commentInput.value = "";
-      });
-      document.addEventListener("click", (event) => {
-  // Проверка, является ли нажатый элемент кнопкой лайка
-  if (event.target.classList.contains("like-button")) {
-    const likeButton = event.target;
-    const likeCounter = likeButton.previousElementSibling;
+  if (foundComment) {
+    foundComment.liked = !foundComment.liked;
+    foundComment.likes = foundComment.liked
+      ? foundComment.likes + 1
+      : foundComment.likes - 1;
 
-    // Изменение стиля кнопки лайка и обновление счетчика лайков
-    if (likeButton.classList.contains("-active-like")) {
-      likeButton.classList.remove("-active-like");
-      likeCounter.textContent = parseInt(likeCounter.textContent) - 1;
-    } else {
-      likeButton.classList.add("-active-like");
-      likeCounter.textContent = parseInt(likeCounter.textContent) + 1;
-    }
+    renderComments();
   }
+}
+
+function validateFields(name, text) {
+  if (name.trim() === "" || text.trim() === "") {
+    return false;
+  }
+  return true;
+}
+
+addButton.addEventListener("click", () => {
+  const name = nameInput.value;
+  const text = commentInput.value;
+
+  if (!validateFields(name, text)) {
+    alert("Пожалуйста, заполните все поля");
+    return;
+  }
+
+  const id = Math.max(...commentsData.map(comment => comment.id)) + 1;
+  const timestamp = new Date().toLocaleString();
+  const newCommentData = { id, name, text, timestamp, likes: 0, liked: false };
+
+  commentsData.push(newCommentData);
+
+  renderComments();
+
+  nameInput.value = "";
+  commentInput.value = "";
 });
+
+renderComments();
   </script>
 </html>
