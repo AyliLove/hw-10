@@ -56,7 +56,7 @@
 
     function renderComments() {
     commentsList.innerHTML = '';
-
+      
   commentsData.forEach(comment => {
     const newComment = createNewComment(comment);
     commentsList.appendChild(newComment);
@@ -68,7 +68,9 @@
   const commentElement = document.createElement("li");
   commentElement.className = "comment";
   commentElement.dataset.id = id;
-
+  commentElement.addEventListener('click', () => {
+    replyToComment(commentData);
+  });
   commentElement.innerHTML = `
     <div class="comment-header">
       <div>${name}</div>
@@ -85,13 +87,25 @@
     </div>
   `;
 
+
+const commentText = commentElement.querySelector('.comment-text');
+commentText.innerText = text;
+ 
   // Обработчик для кнопки лайка
   const likeButton = commentElement.querySelector('.like-button');
-  likeButton.addEventListener('click', () => {
+  likeButton.addEventListener('click', (event) => {
     toggleLike(id);
+    event.stopPropagation();
   });
 
   return commentElement;
+}
+
+function replyToComment(commentData) {
+  nameInput.value = `Ответ на комментарий от ${commentData.name}`;
+  commentInput.value = `@${commentData.name} `;
+  
+  // Дополнительные действия, если необходимо
 }
 
 function toggleLike(commentId) {
